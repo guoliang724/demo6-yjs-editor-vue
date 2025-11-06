@@ -1,12 +1,16 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import YjsEditor from "../view/yjsEditor.vue";
+import quillEditor from "../view/quillEditor.vue";
 import TodoList from "../view/yjsTodoList.vue";
 import YjsBoard from "../view/yjsBoard.vue";
+import YjsEditor from "../view/yjsEditor.vue";
+import Home from "@/view/Home.vue";
 
 const routes = [
-  { path: "/", component: YjsEditor },
-  { path: "/todoList", component: TodoList },
+  { path: "/", component: Home },
+  { path: "/quillEditor", component: quillEditor },
+  { path: "/yjsTodoList", component: TodoList },
   { path: "/yjsBoard", component: YjsBoard },
+  { path: "/yjsEditor", component: YjsEditor },
 ];
 
 const router = createRouter({

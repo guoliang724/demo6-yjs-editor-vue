@@ -1,13 +1,16 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import router from "./router";
+</script>
 
 <template>
   <div id="app">
     <div class="container">
-      <div class="title">Yjs Demos</div>
+      <router-link to="/"><h1 class="title">Yjs Demos:</h1></router-link>
       <div>
         <nav class="link">
-          <router-link to="/">Yjs Editor</router-link>
-          <router-link to="/todoList">Yjs Todo List</router-link>
+          <router-link to="/quillEditor">Quill Editor</router-link>
+          <router-link to="/yjsEditor">Yjs Editor</router-link>
+          <router-link to="/yjsTodoList">Yjs Todo List</router-link>
           <router-link to="/yjsBoard">Yjs Board</router-link>
         </nav>
       </div>
@@ -18,15 +21,15 @@
 </template>
 
 <style scoped lan="less">
-.container{
+.container {
   display: flex;
   flex-direction: column;
-  
 }
 .title {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 16px;
+  text-align: center;
 }
 
 .link {
