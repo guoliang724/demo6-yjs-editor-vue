@@ -12,6 +12,7 @@ import router from "./router";
           <router-link to="/yjsEditor">Yjs Editor</router-link>
           <router-link to="/yjsTodoList">Yjs Todo List</router-link>
           <router-link to="/yjsBoard">Yjs Board</router-link>
+          <router-link to="/yjsCanvas">Yjs Canvas</router-link>
         </nav>
       </div>
 
