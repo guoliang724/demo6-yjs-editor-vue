@@ -42,13 +42,24 @@ const size = ref(4);
 const isEraser = ref(false);
 
 const doc = new Y.Doc();
-doc.getArray<Stroke>("stroke");
+const strokes = doc.getArray<Stroke>("stroke");
 const channel = new BroadcastChannel("yjs-whiteBoard");
 
 let ctx: CanvasRenderingContext2D;
 let drawing = false;
 let lastX = 0;
 let lastY = 0;
+
+function isClearStroke(s: Stroke): s is { type: "clear" } {
+  return "type" in s && s.type === "clear";
+}
+
+//
+function drawLine(info: Stroke) {
+  if (isClearStroke(info)) return;
+
+  ctx.strokeStyle = info.isEraser ? "#fff" : info.color;
+}
 
 function handleMouseDown(e: MouseEvent) {
   drawing = true;
@@ -64,16 +75,29 @@ function moveMouse(e: MouseEvent) {
 
   const rect = canvasRef.value!.getBoundingClientRect();
 
+  // get the coordinates inside the canvas
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
-  const stroke = {
+  const stroke: Stroke = {
     x1: lastX,
     y1: lastY,
+    x2: x,
+    y2: y,
+    color: color.value,
+    size: size.value,
+    isEraser: isEraser.value,
   };
+
+  strokes.push([stroke]);
 }
 
 function handleMouseUp(e: MouseEvent) {}
+
+onMounted(() => {
+  const canvas = canvasRef.value!;
+  ctx = canvas.getContext("2d")!;
+});
 </script>
 
 <style scoped>
