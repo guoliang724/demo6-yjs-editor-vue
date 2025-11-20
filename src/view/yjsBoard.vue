@@ -13,8 +13,10 @@
         <input type="range" min="1" max="20" v-model="size" />
       </label>
       <!-- 当前的状态：是画笔还是橡皮擦 -->
-      <button>"Pen🖌️"</button>
-      <button>🧹 clean up</button>
+      <button @click="toggle" :class="{ active: isEraser }">
+        {{ isEraser ? "pen🖌️" : "eraser" }}
+      </button>
+      <button @click="clearBoard">🧹 clear</button>
     </div>
 
     <canvas ref="canvasRef" class="board" width="800" height="500"></canvas>
@@ -54,11 +56,16 @@ function isClearStroke(s: Stroke): s is { type: "clear" } {
   return "type" in s && s.type === "clear";
 }
 
-//
 function drawLine(info: Stroke) {
   if (isClearStroke(info)) return;
 
   ctx.strokeStyle = info.isEraser ? "#fff" : info.color;
+  ctx.lineWidth = info.size;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(info.x1, info.y1);
+  ctx.lineTo(info.x2, info.y2);
+  ctx.stroke();
 }
 
 function handleMouseDown(e: MouseEvent) {
@@ -70,7 +77,7 @@ function handleMouseDown(e: MouseEvent) {
   lastY = e.clientY - rect.top;
 }
 
-function moveMouse(e: MouseEvent) {
+function handleMouseMove(e: MouseEvent) {
   if (!drawing) return;
 
   const rect = canvasRef.value!.getBoundingClientRect();
@@ -90,13 +97,62 @@ function moveMouse(e: MouseEvent) {
   };
 
   strokes.push([stroke]);
+
+  drawLine(stroke);
+
+  lastX = x;
+  lastY = y;
 }
 
-function handleMouseUp(e: MouseEvent) {}
+function handleMouseUp(e: MouseEvent) {
+  drawing = false;
+}
+
+function renderStroke(s: Stroke) {
+  if (isClearStroke(s)) {
+    ctx.clearRect(0, 0, canvasRef.value!.width, canvasRef.value!.height);
+    return;
+  }
+
+  drawLine(s);
+}
+
+function clearBoard() {
+  strokes.push([
+    {
+      type: "clear",
+    },
+  ]);
+}
+
+function toggle() {
+  isEraser.value = !isEraser.value;
+}
 
 onMounted(() => {
   const canvas = canvasRef.value!;
   ctx = canvas.getContext("2d")!;
+
+  canvas.addEventListener("mousedown", handleMouseDown);
+  canvas.addEventListener("mousemove", handleMouseMove);
+  canvas.addEventListener("mouseup", handleMouseUp);
+  canvas.addEventListener("mouseleave", handleMouseUp);
+
+  strokes.toArray().forEach(renderStroke);
+
+  doc.on("update", (update) => {
+    channel.postMessage(update);
+  });
+
+  channel.addEventListener("message", (e) => {
+    Y.applyUpdate(doc, e.data);
+  });
+
+  strokes.observe((event) => {
+    event.changes.added.forEach((item) =>
+      item.content.getContent().forEach(renderStroke)
+    );
+  });
 });
 </script>
 

@@ -129,4 +129,5 @@ quill-editor
 ![](./public/images/q-editor.gif)
 
 
-yjs-editor
+yjs-whiteboard
+![](./public/images/board.gif)
